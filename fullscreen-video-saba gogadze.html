@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial;
+        font-size: 17px;
+    }
+
+    .video {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+    }
+
+    .content {
+        position: fixed;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        color: #f1f1f1;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .button {
+        width: 200px;
+        font-size: 18px;
+        padding: 10px;
+        border: none;
+        background: #000;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background: #ddd;
+        color: black;
+    }
+    .row {
+      height: 100%;
+    }
+
+
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+</head>
+
+<body>
+
+  <div class="row"><div class="col-md-12"><input id = "filmurl" type = "url"></input> <button onclick="changeUrlOfFilm()"> Change a film</button></div></div>
+  <div class="row"><div iclass="col-md-12"><video id="video" class="video"  ondblclick="makeFullScreen(this)">
+        <source src="http://31.146.20.2/fast16/22329/22329_Georgian_300.mp4" type="video/mp4">
+    </video></div></div>
+
+    <div class="row">
+      <div class="content" id = "controlButtons" onMouseOver="show_sidebar()" onMouseOut="hide_sidebar()">
+
+        <button id="prew" class="button" onclick="rewindPrev()">Prew</button>
+        <button id="toggle" class="button" onclick="togglePlayer()">Play</button>
+        <button id="next" class="button" onclick="rewindNext()">Next</button>
+        <button id="mute" class="button" onclick="toggleMute()">Mute</button>
+    </div>
+  </div>
+
+    <script>
+     function changeUrlOfFilm() {
+     var urlOfFilm = document.getElementById('filmurl').value;
+     var vid = document.getElementById("video");
+     isSupp = vid.canPlayType("video/mp4");
+    if (isSupp == "") {
+        vid.src = "http://31.146.20.2/fast16/22329/22329_Georgian_300.mp4";
+    } else {
+        vid.src = urlOfFilm;
+    }
+    vid.load();
+
+     }
+
+    function makeFullScreen(divObj) {
+   if (!document.fullscreenElement && // alternative standard method
+       !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+       if (divObj.requestFullscreen) {
+           divObj.requestFullscreen();
+       } else if (divObj.msRequestFullscreen) {
+           divObj.msRequestFullscreen();
+       } else if (divObj.mozRequestFullScreen) {
+           divObj.mozRequestFullScreen();
+       } else if (divObj.webkitRequestFullscreen) {
+           divObj.webkitRequestFullscreen();
+       } else {
+           console.log("Fullscreen API is not supported");
+       }
+
+   } else {
+
+       if (document.exitFullscreen) {
+           document.exitFullscreen();
+       } else if (document.msExitFullscreen) {
+           document.msExitFullscreen();
+       } else if (document.mozCancelFullScreen) {
+           document.mozCancelFullScreen();
+       } else if (document.webkitCancelFullScreen) {
+           document.webkitCancelFullScreen();
+       }
+
+   }
+}
+
+
+
+    function show_sidebar()
+   {
+     document.getElementById('controlButtons').style.opacity = 1;
+    }
+
+      function hide_sidebar()
+     {
+     document.getElementById('controlButtons').style.opacity = 0;
+      }
+
+
+        var video = document.getElementById('video');
+        var playButton = document.getElementById('toggle');
+        var muteButton = document.getElementById('mute');
+
+        document.addEventListener('keydown', function(event) {
+            switch(event.code) {
+                case 'ArrowRight':
+                    rewindNext();
+                    break;
+                case 'ArrowLeft':
+                    rewindPrev();
+                    break;
+                case 'ArrowUp':
+                    volumeUp();
+                    break;
+                case 'ArrowDown':
+                    volumeDown();
+                    break;
+                case 'Space':
+                    togglePlayer();
+                    break;
+            }
+        });
+
+        function toggleMute() {
+            if (video.muted) {
+                video.muted = false;
+                muteButton.innerHTML = 'Unmute';
+            } else {
+                video.muted = true;
+                muteButton.innerHTML = 'Mute';
+            }
+        }
+
+        function togglePlayer() {
+            if (window.event) {
+                window.event.stopPropagation();
+                window.event.preventDefault();
+            }
+            if (video.paused) {
+                video.play();
+                playButton.innerHTML = 'Pause';
+            } else {
+                video.pause();
+                playButton.innerHTML = 'Play';
+            }
+        }
+
+        function volumeUp() {
+            if (video.volume < 1) {
+               video.volume = precisionRound(video.volume + 0.1, 1);;
+            }
+        }
+
+        function volumeDown() {
+            if (video.volume > 0) {
+                video.volume = precisionRound(video.volume - 0.1, 1);
+            }
+        }
+
+        function rewindNext() {
+            video.currentTime += 10;
+        }
+
+        function rewindPrev() {
+            video.currentTime -= 10;
+        }
+
+        function precisionRound(number, precision) {
+            var factor = Math.pow(10, precision);
+            return Math.round(number * factor) / factor;
+        }
+
+        togglePlayer();
+        video.muted = false;
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
